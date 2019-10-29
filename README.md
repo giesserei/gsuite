@@ -1,2 +1,2 @@
-# gsuit
-Giesserei G-Suit tools, scripte
+# gsuite
+Giesserei G-Suite tools, scripte
