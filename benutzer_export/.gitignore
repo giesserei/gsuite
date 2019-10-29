@@ -1,0 +1,7 @@
+# python virtual env
+venv
+# credentials
+src/tocken.pickle
+src/credentials.json
+
+
