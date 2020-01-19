@@ -6,7 +6,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/admin.directory.user.readonly', 'https://www.googleapis.com/auth/admin.directory.group.readonly']
+SCOPES = ['https://www.googleapis.com/auth/admin.directory.user.readonly',
+          'https://www.googleapis.com/auth/admin.directory.group.readonly']
 
 
 def main():
@@ -33,32 +34,51 @@ def main():
 
     service = build('admin', 'directory_v1', credentials=creds)
 
-    #list_users(service)
+    # list_users(service)
     list_groups(service)
 
 
-
 def list_groups(service):
+    print('GroupName;GroupEmail;MemberEmail;MemberStatus')
 
-    print('GroupName;GroupEmail;MemberId;MemberEmail;MemberStatus')
+    unique_members = {}
+    groups_of_members = {}
 
     results = service.groups().list(domain='giesserei-gesewo.ch').execute()
-    groups = results.get('groups',[])
+    groups = results.get('groups', [])
 
     for group in groups:
-        #print(u'\n{0} - {1}'.format(group.get('name', ''), group.get('email','')))
-
         # query member list
-        groupId = group.get('id')
-        memberResults = service.members().list(groupKey=groupId).execute()
-        members = memberResults.get('members', [])
+        group_id = group.get('id')
+        group_name = group.get('name', '')
+        group_email = group.get('email', '')
+
+        member_results = service.members().list(groupKey=group_id).execute()
+        members = member_results.get('members', [])
 
         for member in members:
-            #print(u'\t{0} {1} Status: {2}'.format(member['id'], member.get('email',''), member.get('status','-')))
+            member_id = member['id']
+            member_email = member.get('email', '')
+
+            unique_members[member_email] = member
+
+            if member_id not in groups_of_members:
+                groups_of_members[member_id] = set()
+
+            groups_of_members[member_id].add(group_name)
+
             print(u'{0};{1};{2};{3};{4}'.format(
-                group.get('name', ''),
-                group.get('email',''),
-                member['id'], member.get('email', ''), member.get('status', '-')))
+                group_name,
+                group_email,
+                member_id, member_email, member.get('status', '-')))
+
+    print("MemberEmail:GroupNames")
+    for k, member in sorted(unique_members.items()):
+        member_email = member.get('email', '')
+        member_id = member.get('id', '')
+        groups = sorted(groups_of_members[member_id])
+        groups_s = ", ".join(e for e in groups)
+        print(u'"{0}"; "{1}"'.format(member_email, groups_s))
 
 
 def list_users(service):
