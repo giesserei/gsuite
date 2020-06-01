@@ -9,6 +9,10 @@ Der Giesserei Benutzer export orientiert sich an folgendem von Google bereitgest
 - Giesserei G-Suite Account mit Administrator Berechtigung
 - python 3.x + pip
 
+## pycharm (Optinoal)
+- Projekt-spezifische virtualenv python environment aufsetzen
+- pip install -r requirements.txt
+
 ## Vor dem ersten Start
 
 ### Application Credentials
